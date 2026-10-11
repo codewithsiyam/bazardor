@@ -12,7 +12,13 @@ export default function CategoryView({ products }: { products: Product[] }) {
   // Sorting uses the numeric `price` field (never the Bengali display string).
   const sorted = useMemo(() => {
     if (sort === "default") return products;
-    return [...products].sort((a, b) => (sort === "asc" ? a.price - b.price : b.price - a.price));
+    // Copy first (never mutate the shared array). Products without a price always go last.
+    return [...products].sort((a, b) => {
+      if (a.price === null && b.price === null) return 0;
+      if (a.price === null) return 1;
+      if (b.price === null) return -1;
+      return sort === "asc" ? a.price - b.price : b.price - a.price;
+    });
   }, [products, sort]);
 
   if (products.length === 0) {
@@ -30,7 +36,7 @@ export default function CategoryView({ products }: { products: Product[] }) {
   return (
     <>
       <div className="mb-5 flex items-center justify-between gap-3">
-        <p className="text-sm text-muted">মোট {new Intl.NumberFormat("bn-BD").format(products.length)}টি পণ্য</p>
+        <p className="text-sm text-muted">মোট {new Intl.NumberFormat("bn-BD").format(products.length)}টি পণ্য দেখানো হচ্ছে</p>
         <label className="flex items-center gap-2 text-sm font-medium">
           সাজান:
           <span className="relative">

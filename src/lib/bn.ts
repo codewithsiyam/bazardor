@@ -32,14 +32,26 @@ export function formatTaka(value: number): string {
   return `${formatNumber(value)} টাকা`;
 }
 
+/** 2.1 -> "২.১০%" (unsigned magnitude). */
 export function formatPercent(value: number): string {
-  return `${toBn(Math.abs(value).toFixed(1))}%`;
+  return `${toBn(Math.abs(value).toFixed(2))}%`;
 }
 
-export type Trend = "up" | "down" | "flat";
+/** 2.1 -> "+২.১০%", -2.9 -> "-২.৯০%", 0 -> "০.০০%". */
+export function formatSignedPercent(value: number): string {
+  const rounded = Math.round(value * 100) / 100;
+  const sign = rounded > 0 ? "+" : rounded < 0 ? "-" : "";
+  return `${sign}${toBn(Math.abs(rounded).toFixed(2))}%`;
+}
 
-export function trendOf(changePercent: number): Trend {
-  if (changePercent > 0) return "up";
-  if (changePercent < 0) return "down";
+export type Trend = "up" | "down" | "flat" | "unknown";
+
+/** Direction from a signed % change. `null` (no genuine data) is "unknown", never "flat". */
+export function trendOf(changePercent: number | null): Trend {
+  if (changePercent === null) return "unknown";
+  // Compare the value as it will be displayed (2 decimals) so "▲ +০.০০%" can never appear.
+  const rounded = Math.round(changePercent * 100) / 100;
+  if (rounded > 0) return "up";
+  if (rounded < 0) return "down";
   return "flat";
 }

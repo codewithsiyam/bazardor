@@ -1,0 +1,10 @@
+[33m909e395[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m docs: add project README with setup, env vars and deployment steps
+[33meda5b6a[m fix: add friendly 404 page for unknown routes, products and categories
+[33mabb637a[m feat: add profile page and update-name flow
+[33m26e54b1[m feat: implement BetterAuth sign in, sign up and social login with toasts
+[33m1295775[m feat: add protected product detail page with price summary and market table
+[33m057a23c[m feat: add category page with numeric price sorting and skeleton loading
+[33m2ea79c2[m feat: add home page with hero, risers, fallers and all-products grid
+[33m50314de[m feat: build responsive navbar with Bangla date, category links and price ticker
+[33m55de6db[m feat: add typed API layer, Bengali number utilities and BetterAuth server setup
+[33m5157c66[m chore: scaffold Next.js app with Tailwind, TypeScript and project assets

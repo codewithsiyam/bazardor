@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typegen": "next typegen",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@fontsource/hind-siliguri": "^5.3.0",

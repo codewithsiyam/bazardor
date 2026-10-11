@@ -46,23 +46,40 @@ export function unwrapOne(json: unknown, keys: string[]): Raw | null {
   return null;
 }
 
+const UNIT_BN: Record<string, string> = {
+  kg: "প্রতি কেজি",
+  litre: "প্রতি লিটার",
+  liter: "প্রতি লিটার",
+  dozen: "প্রতি ডজন",
+  piece: "প্রতি পিস",
+  pcs: "প্রতি পিস",
+  pc: "প্রতি পিস",
+  gram: "প্রতি গ্রাম",
+  halli: "প্রতি হালি",
+};
+
+/** API sends English unit codes ("kg", "dozen"); show the Bengali label. Unknown values pass through. */
+function normalizeUnit(raw: string): string {
+  return UNIT_BN[raw.toLowerCase()] ?? raw;
+}
+
+/** Real API shape: [{ market, division, min, max }]. A plain { market, price } is also accepted. */
 function normalizeMarkets(raw: unknown): MarketPrice[] {
-  if (Array.isArray(raw)) {
-    return raw
-      .filter(isObj)
-      .map((m): MarketPrice | null => {
-        const name = str(pick(m, ["market", "name", "bazar", "bazaar", "marketName"]));
-        const price = parseNumber(pick(m, ["price", "todayPrice", "currentPrice", "amount"]));
-        return name && price !== null ? { market: name, price } : null;
-      })
-      .filter((m): m is MarketPrice => m !== null);
-  }
-  if (isObj(raw)) {
-    return Object.entries(raw)
-      .map(([market, v]) => ({ market, price: parseNumber(isObj(v) ? pick(v, ["price"]) : v) }))
-      .filter((m): m is MarketPrice => m.price !== null);
-  }
-  return [];
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter(isObj)
+    .map((m): MarketPrice | null => {
+      const market = str(pick(m, ["market", "name", "bazar", "bazaar", "marketName"]));
+      if (!market) return null;
+      const single = parseNumber(pick(m, ["price", "todayPrice", "currentPrice", "amount"]));
+      const min = parseNumber(pick(m, ["min", "minPrice"])) ?? single;
+      const max = parseNumber(pick(m, ["max", "maxPrice"])) ?? single;
+      if (min === null || max === null) return null;
+      const lo = Math.min(min, max);
+      const hi = Math.max(min, max);
+      return { market, division: str(pick(m, ["division", "district", "city"])), min: lo, max: hi, avg: (lo + hi) / 2 };
+    })
+    .filter((m): m is MarketPrice => m !== null);
 }
 
 export function normalizeProduct(raw: Raw): Product | null {
@@ -70,41 +87,65 @@ export function normalizeProduct(raw: Raw): Product | null {
   const name = str(pick(raw, ["nameBn", "name", "title", "productName"]));
   if (!name) return null;
 
-  const price =
-    parseNumber(pick(raw, ["price", "todayPrice", "currentPrice", "today", "avgPrice"])) ?? 0;
-  const yesterday = parseNumber(pick(raw, ["yesterdayPrice", "previousPrice", "prevPrice", "oldPrice"]));
+  const markets = normalizeMarkets(pick(raw, ["markets", "marketPrices", "bazarPrices", "bazars"]));
 
-  let changePercent = parseNumber(
-    pick(raw, ["changePercent", "percentChange", "changePct", "change_percent", "percent", "change"]),
-  );
-  let changeAmount = parseNumber(pick(raw, ["changeAmount", "priceChange", "diff"]));
-  if (changeAmount === null && yesterday !== null) changeAmount = price - yesterday;
-  if (changePercent === null) {
-    changePercent = yesterday ? ((price - yesterday) / yesterday) * 100 : 0;
+  // Price: never default a missing price to 0. If only per-bazar prices exist, use their average.
+  let price = parseNumber(pick(raw, ["today", "price", "todayPrice", "currentPrice"]));
+  if (price === null && markets.length) price = markets.reduce((sum, m) => sum + m.avg, 0) / markets.length;
+  const yesterday = parseNumber(pick(raw, ["yesterday", "yesterdayPrice", "previousPrice", "prevPrice", "oldPrice", "lastPrice"]));
+  const lastWeek = parseNumber(pick(raw, ["lastWeek", "lastWeekPrice"]));
+  const lastMonth = parseNumber(pick(raw, ["lastMonth", "lastMonthPrice"]));
+
+  // Change. Real API: change = { dir: "up" | "down" | "flat", pct: 2.1 } (pct is signed).
+  // Otherwise use explicit percent fields, otherwise compute from genuine current + previous prices.
+  // If none exist the change stays null ("no data"), never 0.
+  let changePercent: number | null = null;
+  let dir = str(pick(raw, ["trend", "direction", "changeType"])).toLowerCase();
+  const changeField = pick(raw, ["change"]);
+  if (isObj(changeField)) {
+    changePercent = parseNumber(pick(changeField, ["pct", "percent", "percentage", "value"]));
+    dir = str(pick(changeField, ["dir", "direction", "trend"])).toLowerCase() || dir;
   }
-  // Some APIs send direction separately ("up" | "down") with an unsigned percent.
-  const dir = str(pick(raw, ["trend", "direction", "changeType"])).toLowerCase();
-  if (dir === "down" || dir === "fall") changePercent = -Math.abs(changePercent);
-  if (dir === "up" || dir === "rise") changePercent = Math.abs(changePercent);
+  if (changePercent === null) {
+    changePercent = parseNumber(
+      pick(raw, ["changePercent", "percentChange", "changePct", "changePercentage", "percentageChange", "pct"]),
+    );
+  }
+  let changeAmount = parseNumber(pick(raw, ["changeAmount", "priceChange", "diff", "difference"]));
+  if (changeAmount === null && yesterday !== null && price !== null) changeAmount = price - yesterday;
+  if (changePercent === null && yesterday && price !== null) {
+    changePercent = ((price - yesterday) / yesterday) * 100;
+  }
+  if (changePercent === null && typeof changeField === "string" && changeField.includes("%")) {
+    changePercent = parseNumber(changeField); // only a string that is explicitly a percentage
+  }
+  if (changePercent !== null) {
+    if (dir === "down" || dir === "fall") changePercent = -Math.abs(changePercent);
+    else if (dir === "up" || dir === "rise") changePercent = Math.abs(changePercent);
+    else if (dir === "flat" || dir === "same") changePercent = 0;
+    if (!Number.isFinite(changePercent)) changePercent = null;
+  }
 
-  const markets = normalizeMarkets(pick(raw, ["markets", "marketPrices", "bazars", "prices"]));
   const category = str(pick(raw, ["category", "categorySlug", "categoryId"]));
   const tagsRaw = pick(raw, ["tags"]);
-  const categoryName = str(pick(raw, ["categoryName", "categoryBn"]), category);
+  const categoryName = str(pick(raw, ["categoryNameBn", "categoryName", "categoryBn"]), category);
 
   return {
     id: id || name,
     slug: str(pick(raw, ["slug"])) || id || name,
     name,
-    emoji: str(pick(raw, ["emoji", "icon", "image"]), "🛒"),
-    unit: str(pick(raw, ["unit", "unitBn"]), "প্রতি কেজি"),
+    emoji: str(pick(raw, ["image", "emoji", "icon", "categoryIcon"]), "🛒"),
+    unit: normalizeUnit(str(pick(raw, ["unitBn", "unit"]))),
     category,
     categoryName,
     tags: Array.isArray(tagsRaw) ? tagsRaw.map((t) => str(t)).filter(Boolean) : categoryName ? [categoryName] : [],
     description: str(pick(raw, ["description", "summary", "subtitle", "desc"])),
     price,
-    changePercent: Number.isFinite(changePercent) ? changePercent : 0,
+    changePercent,
     changeAmount,
+    yesterday,
+    lastWeek,
+    lastMonth,
     markets,
   };
 }

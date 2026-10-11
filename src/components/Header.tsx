@@ -1,21 +1,9 @@
 import { connection } from "next/server";
 import { getCategories, getProducts } from "@/lib/api";
-import { toBn } from "@/lib/bn";
+import { banglaDate } from "@/lib/date";
 import type { Category, Product } from "@/types";
 import Navbar from "./Navbar";
 import Ticker from "./Ticker";
-
-function banglaDate(): string {
-  const d = new Date();
-  const parts = new Intl.DateTimeFormat("bn-BD", {
-    timeZone: "Asia/Dhaka",
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(d);
-  return toBn(parts);
-}
 
 /** Server Component: fetches on the server, hands plain data to the client Navbar. */
 export default async function Header() {

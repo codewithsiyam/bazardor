@@ -21,12 +21,15 @@ export default async function CategoryPage({ params }: PageProps<"/category/[slu
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-6 flex items-center gap-3 text-3xl font-bold">
-        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-soft text-2xl" aria-hidden>
+      <div className="mb-6 flex items-center gap-3">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-paper text-2xl ring-1 ring-line" aria-hidden>
           {category?.icon ?? "🛒"}
         </span>
-        {category?.name ?? slug}
-      </h1>
+        <div>
+          <h1 className="text-2xl font-bold sm:text-3xl">{category?.name ?? slug}</h1>
+          <p className="text-sm text-muted">{new Intl.NumberFormat("bn-BD").format(products.length)}টি পণ্যের আজকের দাম ও পরিবর্তন</p>
+        </div>
+      </div>
       <CategoryView products={products} />
     </div>
   );
