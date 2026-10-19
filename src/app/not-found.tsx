@@ -1,18 +1,17 @@
-import Link from "next/link";
-import StatusCard from "@/components/StatusCard";
+import type { Metadata } from "next";
+import StateMessage from "@/components/StateMessage";
+
+export const metadata: Metadata = { title: "পেজটি পাওয়া যায়নি" };
 
 export default function NotFound() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
-      <StatusCard
+    <div className="mx-auto max-w-6xl px-4 py-10">
+      <StateMessage
         emoji="🔍"
         title="পেজটি পাওয়া যায়নি"
-        description="আপনি যে পেজ, ক্যাটাগরি বা পণ্যটি খুঁজছেন সেটি নেই — লিংকটি ভুল হতে পারে অথবা সরিয়ে ফেলা হয়েছে।"
-      >
-        <Link href="/" className="btn btn-primary">
-          হোম পেজে ফিরে যান
-        </Link>
-      </StatusCard>
+        description="আপনি যে পেজ বা পণ্যটি খুঁজছেন সেটি পাওয়া যায়নি। লিংকটি ভুল হতে পারে অথবা পেজটি সরিয়ে ফেলা হয়েছে।"
+        action={{ href: "/", label: "হোম পেজে ফিরে যান" }}
+      />
     </div>
   );
 }

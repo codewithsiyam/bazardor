@@ -1,33 +1,39 @@
 import Link from "next/link";
+import ChangeBadge from "@/components/ChangeBadge";
+import { formatTaka, getPerUnitBn } from "@/lib/format";
+import { getProductEmoji } from "@/lib/products";
 import type { Product } from "@/types";
-import { formatTaka, getUnitBn } from "@/lib/format";
-import ChangeBadge from "./ChangeBadge";
 
+/** Whole card is a link to the (protected) product detail page. */
 export default function ProductCard({ product }: { product: Product }) {
-  const unit = getUnitBn(product.unit);
   return (
     <Link
       href={`/product/${encodeURIComponent(product.slug)}`}
-      className="group block rounded-2xl border border-base-300 bg-base-100 p-4 transition hover:border-primary/50 hover:shadow-md focus-visible:border-primary"
+      className="group block h-full rounded-2xl border border-base-300 bg-base-100 transition-all hover:border-primary/40 hover:shadow-md motion-safe:hover:-translate-y-0.5"
     >
-      <div className="flex items-center gap-3">
-        <span
-          className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-base-200 text-2xl"
-          aria-hidden="true"
-        >
-          {product.image}
-        </span>
-        <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold leading-6">{product.nameBn}</h3>
-          {unit && <p className="text-xs leading-4 text-base-content/60">{unit}</p>}
+      <div className="flex flex-col gap-3 p-4">
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="grid size-12 shrink-0 place-items-center rounded-xl bg-base-200 text-2xl"
+          >
+            {getProductEmoji(product)}
+          </span>
+          <div className="min-w-0">
+            <h3 className="truncate text-base font-semibold group-hover:text-primary">
+              {product.nameBn}
+            </h3>
+            <p className="text-xs text-base-content/70">{getPerUnitBn(product.unit)}</p>
+          </div>
         </div>
-      </div>
-      <div className="mt-3 flex items-end justify-between gap-3">
-        <div>
-          <p className="text-xs leading-4 text-base-content/60">আজকের দাম</p>
-          <p className="text-xl font-bold leading-7">{formatTaka(product.today)}</p>
+
+        <div className="flex items-end justify-between gap-2">
+          <div>
+            <p className="text-xs text-base-content/70">আজকের দাম</p>
+            <p className="text-xl font-bold">{formatTaka(product.today)}</p>
+          </div>
+          <ChangeBadge change={product.change} />
         </div>
-        <ChangeBadge change={product.change} />
       </div>
     </Link>
   );
