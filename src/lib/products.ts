@@ -1,62 +1,94 @@
-import type { Market, MarketStats, Product, SortMode } from "@/types";
+import type { MarketRow, PriceSummary, Product, SortMode } from "@/types";
 
-/** Numeric sort on the stored number (never on the Bengali display string). Missing prices go last. */
+/** Pure product helpers (sorting, movers, price statistics). */
+
+/** Never mutates the input. Sorting is numeric (by `today`), never alphabetical. */
 export function sortProducts(products: Product[], mode: SortMode): Product[] {
-  if (mode === "default") return products;
-  const list = [...products];
-  list.sort((a, b) => {
-    if (a.today === null && b.today === null) return 0;
-    if (a.today === null) return 1;
-    if (b.today === null) return -1;
-    return mode === "price-asc" ? a.today - b.today : b.today - a.today;
-  });
-  return list;
+  const copy = [...products];
+  if (mode === "price-asc") return copy.sort((a, b) => a.today - b.today);
+  if (mode === "price-desc") return copy.sort((a, b) => b.today - a.today);
+  return copy;
 }
 
-/** Products whose change data (from the API, or derived from yesterday's price) says "up". */
+/** Top risers, biggest percentage increase first. Only items the API flags as "up". */
 export function getRisers(products: Product[], limit = 6): Product[] {
   return products
-    .filter((p) => p.change?.dir === "up" && p.change.pct > 0)
-    .sort((a, b) => (b.change?.pct ?? 0) - (a.change?.pct ?? 0))
+    .filter((product) => product.change.dir === "up")
+    .sort((a, b) => b.change.pct - a.change.pct)
     .slice(0, limit);
 }
 
+/** Top fallers, biggest percentage drop first. Only items the API flags as "down". */
 export function getFallers(products: Product[], limit = 6): Product[] {
   return products
-    .filter((p) => p.change?.dir === "down" && p.change.pct > 0)
-    .sort((a, b) => (b.change?.pct ?? 0) - (a.change?.pct ?? 0))
+    .filter((product) => product.change.dir === "down")
+    .sort((a, b) => a.change.pct - b.change.pct)
     .slice(0, limit);
 }
 
-/** Per-market average of its min and max. */
-export function marketAverage(m: Market): number {
-  return (m.min + m.max) / 2;
+/** Looks a product up by slug first; a purely numeric value is treated as an id. */
+export function findProductByParam(products: Product[], param: string): Product | null {
+  const bySlug = products.find((product) => product.slug === param);
+  if (bySlug) return bySlug;
+  if (/^\d+$/.test(param)) {
+    return products.find((product) => product.id === Number(param)) ?? null;
+  }
+  return null;
 }
 
-/** Min / max / average computed only from valid market records. Null when there are none. */
-export function computeMarketStats(markets: Market[]): MarketStats | null {
-  const valid = markets.filter((m) => Number.isFinite(m.min) && Number.isFinite(m.max) && m.min > 0 && m.max > 0);
-  if (valid.length === 0) return null;
-  let minM = valid[0];
-  let maxM = valid[0];
-  let total = 0;
-  for (const m of valid) {
-    if (m.min < minM.min) minM = m;
-    if (m.max > maxM.max) maxM = m;
-    total += marketAverage(m);
+/** Only market records with real, sane numbers take part in any statistic. */
+export function getValidMarkets(product: Product): MarketRow[] {
+  return product.markets
+    .filter(
+      (market) =>
+        typeof market.market === "string" &&
+        market.market.trim() !== "" &&
+        Number.isFinite(market.min) &&
+        Number.isFinite(market.max) &&
+        market.min > 0 &&
+        market.max >= market.min,
+    )
+    .map((market) => ({ ...market, avg: (market.min + market.max) / 2 }));
+}
+
+/** Market table order: cheapest average first (ties by name). */
+export function getMarketRows(product: Product): MarketRow[] {
+  return getValidMarkets(product).sort(
+    (a, b) => a.avg - b.avg || a.market.localeCompare(b.market, "bn"),
+  );
+}
+
+/** Returns null when there is no valid market record to calculate from. */
+export function getPriceSummary(product: Product): PriceSummary | null {
+  const markets = getValidMarkets(product);
+  if (markets.length === 0) return null;
+
+  let minMarket = markets[0];
+  let maxMarket = markets[0];
+  let avgTotal = 0;
+  for (const market of markets) {
+    if (market.min < minMarket.min) minMarket = market;
+    if (market.max > maxMarket.max) maxMarket = market;
+    avgTotal += market.avg;
   }
+
   return {
-    min: minM.min,
-    minMarket: minM.market,
-    max: maxM.max,
-    maxMarket: maxM.market,
-    avg: Math.round((total / valid.length) * 100) / 100,
+    min: minMarket.min,
+    max: maxMarket.max,
+    avg: Math.round(avgTotal / markets.length),
+    minMarket,
+    maxMarket,
+    marketCount: markets.length,
   };
 }
 
-export function changeSummary(product: Product): string | null {
-  if (!product.change) return null;
-  if (product.change.dir === "up") return "গতকালের তুলনায় আজ দাম বেড়েছে";
-  if (product.change.dir === "down") return "গতকালের তুলনায় আজ দাম কমেছে";
-  return "গতকালের তুলনায় আজ দাম অপরিবর্তিত";
+/** Absolute difference between today's and yesterday's price, when both are real. */
+export function getDayDifference(product: Product): number | null {
+  if (typeof product.yesterday !== "number" || !Number.isFinite(product.yesterday)) return null;
+  return Math.abs(product.today - product.yesterday);
+}
+
+/** Emoji used for the product illustration, with safe fallbacks. */
+export function getProductEmoji(product: Product): string {
+  return product.image || product.categoryIcon || "🛒";
 }

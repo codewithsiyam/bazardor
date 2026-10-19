@@ -1,12 +1,21 @@
+/**
+ * Types below mirror the REAL responses of
+ * https://api.api-store.workers.dev/api/bazardor  (/products and /categories),
+ * which were inspected before this file was written.
+ *
+ * Fields that the UI can live without are optional so that a partially
+ * incomplete record never crashes a page.
+ */
+
 export type PriceDirection = "up" | "down" | "flat";
 
 export interface PriceChange {
   dir: PriceDirection;
-  /** Absolute percentage, e.g. 2.1 means 2.1% */
+  /** Signed percentage: negative when the price fell. */
   pct: number;
 }
 
-export interface Market {
+export interface MarketPrice {
   market: string;
   division: string;
   min: number;
@@ -14,23 +23,22 @@ export interface Market {
 }
 
 export interface Product {
-  id: string;
+  id: number;
   slug: string;
   nameBn: string;
   category: string;
-  categoryNameBn: string;
-  categoryIcon: string;
+  categoryNameBn?: string;
+  categoryIcon?: string;
+  /** e.g. "kg" | "litre" | "dozen" | "piece" */
   unit: string;
-  /** Emoji (or short glyph) used as the product picture */
-  image: string;
-  description: string | null;
-  today: number | null;
-  yesterday: number | null;
-  lastWeek: number | null;
-  lastMonth: number | null;
-  /** null when neither the API nor yesterday's price allows a defensible value */
-  change: PriceChange | null;
-  markets: Market[];
+  /** Emoji used as the product illustration. */
+  image?: string;
+  today: number;
+  yesterday?: number;
+  lastWeek?: number;
+  lastMonth?: number;
+  change: PriceChange;
+  markets: MarketPrice[];
 }
 
 export interface Category {
@@ -42,10 +50,16 @@ export interface Category {
 
 export type SortMode = "default" | "price-asc" | "price-desc";
 
-export interface MarketStats {
+export interface PriceSummary {
   min: number;
-  minMarket: string;
   max: number;
-  maxMarket: string;
+  /** Mean of every market's (min + max) / 2, rounded to a whole taka. */
+  avg: number;
+  minMarket: MarketPrice;
+  maxMarket: MarketPrice;
+  marketCount: number;
+}
+
+export interface MarketRow extends MarketPrice {
   avg: number;
 }
