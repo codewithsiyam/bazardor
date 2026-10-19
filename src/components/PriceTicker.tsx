@@ -1,46 +1,56 @@
+import { formatPercent, formatPrice, getTakaPerUnit } from "@/lib/format";
+import { getProductEmoji } from "@/lib/products";
 import type { Product } from "@/types";
-import { formatPercent, formatPrice, getUnitName } from "@/lib/format";
 
-const ARROWS = { up: "▲", down: "▼", flat: "—" } as const;
-const COLORS = { up: "text-error", down: "text-success", flat: "text-base-content/60" } as const;
+const CHANGE_STYLE = {
+  up: { arrow: "▲", className: "text-error" },
+  down: { arrow: "▼", className: "text-success" },
+  flat: { arrow: "—", className: "text-base-content/60" },
+} as const;
 
-function TickerItem({ product }: { product: Product }) {
-  const unit = getUnitName(product.unit);
+function TickerList({ products, hidden = false }: { products: Product[]; hidden?: boolean }) {
   return (
-    <span className="flex h-9 items-center gap-2 whitespace-nowrap border-r border-base-200 px-4 text-sm">
-      <span aria-hidden="true">{product.image}</span>
-      <span className="font-medium">{product.nameBn}</span>
-      <span>
-        {formatPrice(product.today)} টাকা{unit ? `/${unit}` : ""}
-      </span>
-      {product.change && (
-        <span className={`font-semibold ${COLORS[product.change.dir]}`}>
-          {ARROWS[product.change.dir]} {formatPercent(product.change.pct)}
-        </span>
-      )}
-    </span>
+    <ul className="flex shrink-0" aria-hidden={hidden || undefined}>
+      {products.map((product) => {
+        const style = CHANGE_STYLE[product.change.dir];
+        return (
+          <li
+            key={product.id}
+            className="flex items-center gap-1.5 whitespace-nowrap border-r border-base-200 px-4 py-2 text-sm"
+          >
+            <span aria-hidden="true">{getProductEmoji(product)}</span>
+            <span className="font-medium">{product.nameBn}</span>
+            <span>
+              {formatPrice(product.today)} {getTakaPerUnit(product.unit)}
+            </span>
+            <span className={`font-semibold ${style.className}`}>
+              {style.arrow} {formatPercent(product.change.dir === "flat" ? 0 : product.change.pct)}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
-/** Infinite price strip. The list is rendered twice and shifted by -50% for a seamless loop. */
+/**
+ * Infinite horizontal price strip. The list is rendered twice and the track is
+ * translated by -50%, which makes the loop seamless. Pauses on hover/focus and
+ * stops (becomes scrollable) when the user prefers reduced motion.
+ */
 export default function PriceTicker({ products }: { products: Product[] }) {
-  const items = products.filter((p) => p.today !== null);
-  if (items.length === 0) return null;
+  if (products.length === 0) return null;
+  const duration = Math.max(40, Math.round(products.length * 3.5));
 
   return (
-    <div className="ticker overflow-hidden border-b border-base-300 bg-base-100" role="region" aria-label="আজকের দামের তালিকা">
-      <div className="ticker-track" style={{ animationDuration: `${Math.max(40, items.length * 4)}s` }}>
-        <div className="flex">
-          {items.map((product) => (
-            <TickerItem key={`a-${product.slug}`} product={product} />
-          ))}
-        </div>
-        <div className="flex" aria-hidden="true">
-          {items.map((product) => (
-            <TickerItem key={`b-${product.slug}`} product={product} />
-          ))}
-        </div>
+    <section
+      aria-label="আজকের পণ্যের দাম"
+      className="bz-marquee overflow-hidden border-b border-base-300 bg-base-100"
+    >
+      <div className="bz-marquee-track" style={{ animationDuration: `${duration}s` }}>
+        <TickerList products={products} />
+        <TickerList products={products} hidden />
       </div>
-    </div>
+    </section>
   );
 }

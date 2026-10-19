@@ -3,17 +3,18 @@
 import { useSyncExternalStore } from "react";
 import { getBanglaDate } from "@/lib/format";
 
-function subscribe(onChange: () => void) {
-  const id = setInterval(onChange, 60_000);
-  return () => clearInterval(id);
-}
+const subscribe = () => () => {};
+const getServerSnapshot = () => "";
 
-/** Renders today's Bangla date. Empty on the server, filled on the client → no hydration mismatch. */
+/**
+ * Today's date in Bangla (Asia/Dhaka). Rendered on the client only, so the date
+ * is never stale on cached pages and never causes a hydration mismatch.
+ */
 export default function BanglaDate({ className }: { className?: string }) {
-  const date = useSyncExternalStore(subscribe, () => getBanglaDate(), () => "");
+  const text = useSyncExternalStore(subscribe, () => getBanglaDate(), getServerSnapshot);
   return (
     <span className={className} suppressHydrationWarning>
-      {date || "\u00a0"}
+      {text || "\u00a0"}
     </span>
   );
 }
