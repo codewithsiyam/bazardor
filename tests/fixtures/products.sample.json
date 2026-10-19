@@ -1,0 +1,370 @@
+[
+ {
+  "id": 4,
+  "slug": "batam-size-chal",
+  "nameBn": "বাটাম সাইজ চাল",
+  "category": "chal",
+  "categoryNameBn": "চাল",
+  "categoryIcon": "🍚",
+  "unit": "kg",
+  "image": "🍚",
+  "today": 66,
+  "yesterday": 64,
+  "lastWeek": 63,
+  "lastMonth": 61,
+  "change": {
+   "dir": "up",
+   "pct": 3.1
+  },
+  "markets": [
+   {
+    "market": "কারওয়ান বাজার",
+    "division": "ঢাকা",
+    "min": 65,
+    "max": 73
+   },
+   {
+    "market": "গ্রীন মার্কেট, মিরপুর",
+    "division": "ঢাকা",
+    "min": 64,
+    "max": 71
+   },
+   {
+    "market": "চৌদগ্রাম বাজার",
+    "division": "চট্টগ্রাম",
+    "min": 63,
+    "max": 73
+   },
+   {
+    "market": "আমতলী বাজার",
+    "division": "চট্টগ্রাম",
+    "min": 61,
+    "max": 69
+   },
+   {
+    "market": "সদর বাজার",
+    "division": "রাজশাহী",
+    "min": 60,
+    "max": 66
+   },
+   {
+    "market": "বাসারহাট বাজার",
+    "division": "রাজশাহী",
+    "min": 60,
+    "max": 68
+   },
+   {
+    "market": "মাঠ বাজার",
+    "division": "ময়মনসিংহ",
+    "min": 59,
+    "max": 65
+   },
+   {
+    "market": "চৌর বাজার",
+    "division": "ময়মনসিংহ",
+    "min": 60,
+    "max": 69
+   },
+   {
+    "market": "বাজারহাট",
+    "division": "খুলনা",
+    "min": 60,
+    "max": 67
+   },
+   {
+    "market": "ডবলগেট বাজার",
+    "division": "খুলনা",
+    "min": 62,
+    "max": 69
+   },
+   {
+    "market": "আমবাজার",
+    "division": "সিলেট",
+    "min": 64,
+    "max": 73
+   },
+   {
+    "market": "চৌরাস্তা বাজার",
+    "division": "সিলেট",
+    "min": 63,
+    "max": 71
+   }
+  ]
+ },
+ {
+  "id": 12,
+  "slug": "alu",
+  "nameBn": "আলু",
+  "category": "sobji",
+  "categoryNameBn": "সবজি",
+  "categoryIcon": "🥬",
+  "unit": "kg",
+  "image": "🥔",
+  "today": 30,
+  "yesterday": 32,
+  "lastWeek": 34,
+  "lastMonth": 36,
+  "change": {
+   "dir": "down",
+   "pct": -6.2
+  },
+  "markets": [
+   {
+    "market": "কারওয়ান বাজার",
+    "division": "ঢাকা",
+    "min": 30,
+    "max": 33
+   },
+   {
+    "market": "গ্রীন মার্কেট, মিরপুর",
+    "division": "ঢাকা",
+    "min": 29,
+    "max": 32
+   },
+   {
+    "market": "চৌদগ্রাম বাজার",
+    "division": "চট্টগ্রাম",
+    "min": 32,
+    "max": 36
+   },
+   {
+    "market": "আমতলী বাজার",
+    "division": "চট্টগ্রাম",
+    "min": 31,
+    "max": 35
+   },
+   {
+    "market": "সদর বাজার",
+    "division": "রাজশাহী",
+    "min": 27,
+    "max": 30
+   },
+   {
+    "market": "বাসারহাট বাজার",
+    "division": "রাজশাহী",
+    "min": 27,
+    "max": 31
+   },
+   {
+    "market": "মাঠ বাজার",
+    "division": "ময়মনসিংহ",
+    "min": 27,
+    "max": 30
+   },
+   {
+    "market": "চৌর বাজার",
+    "division": "ময়মনসিংহ",
+    "min": 27,
+    "max": 31
+   },
+   {
+    "market": "বাজারহাট",
+    "division": "খুলনা",
+    "min": 24,
+    "max": 27
+   },
+   {
+    "market": "ডবলগেট বাজার",
+    "division": "খুলনা",
+    "min": 25,
+    "max": 27
+   },
+   {
+    "market": "আমবাজার",
+    "division": "সিলেট",
+    "min": 29,
+    "max": 33
+   },
+   {
+    "market": "চৌরাস্তা বাজার",
+    "division": "সিলেট",
+    "min": 28,
+    "max": 32
+   }
+  ]
+ },
+ {
+  "id": 13,
+  "slug": "peyaj",
+  "nameBn": "পেঁয়াজ",
+  "category": "sobji",
+  "categoryNameBn": "সবজি",
+  "categoryIcon": "🥬",
+  "unit": "kg",
+  "image": "🧅",
+  "today": 54,
+  "yesterday": 48,
+  "lastWeek": 45,
+  "lastMonth": 60,
+  "change": {
+   "dir": "up",
+   "pct": 12.5
+  },
+  "markets": [
+   {
+    "market": "কারওয়ান বাজার",
+    "division": "ঢাকা",
+    "min": 58,
+    "max": 65
+   },
+   {
+    "market": "গ্রীন মার্কেট, মিরপুর",
+    "division": "ঢাকা",
+    "min": 57,
+    "max": 62
+   },
+   {
+    "market": "চৌদগ্রাম বাজার",
+    "division": "চট্টগ্রাম",
+    "min": 52,
+    "max": 60
+   },
+   {
+    "market": "আমতলী বাজার",
+    "division": "চট্টগ্রাম",
+    "min": 50,
+    "max": 57
+   },
+   {
+    "market": "সদর বাজার",
+    "division": "রাজশাহী",
+    "min": 49,
+    "max": 54
+   },
+   {
+    "market": "বাসারহাট বাজার",
+    "division": "রাজশাহী",
+    "min": 49,
+    "max": 56
+   },
+   {
+    "market": "মাঠ বাজার",
+    "division": "ময়মনসিংহ",
+    "min": 41,
+    "max": 46
+   },
+   {
+    "market": "চৌর বাজার",
+    "division": "ময়মনসিংহ",
+    "min": 42,
+    "max": 49
+   },
+   {
+    "market": "বাজারহাট",
+    "division": "খুলনা",
+    "min": 49,
+    "max": 55
+   },
+   {
+    "market": "ডবলগেট বাজার",
+    "division": "খুলনা",
+    "min": 51,
+    "max": 56
+   },
+   {
+    "market": "আমবাজার",
+    "division": "সিলেট",
+    "min": 52,
+    "max": 60
+   },
+   {
+    "market": "চৌরাস্তা বাজার",
+    "division": "সিলেট",
+    "min": 51,
+    "max": 58
+   }
+  ]
+ },
+ {
+  "id": 19,
+  "slug": "ilish-mach",
+  "nameBn": "ইলিশ মাছ",
+  "category": "mach",
+  "categoryNameBn": "মাছ",
+  "categoryIcon": "🐟",
+  "unit": "kg",
+  "image": "🐠",
+  "today": 1850,
+  "yesterday": 1790,
+  "lastWeek": 1700,
+  "lastMonth": 1650,
+  "change": {
+   "dir": "up",
+   "pct": 3.4
+  },
+  "markets": [
+   {
+    "market": "কারওয়ান বাজার",
+    "division": "ঢাকা",
+    "min": 2155,
+    "max": 2430
+   },
+   {
+    "market": "গ্রীন মার্কেট, মিরপুর",
+    "division": "ঢাকা",
+    "min": 2115,
+    "max": 2338
+   },
+   {
+    "market": "চৌদগ্রাম বাজার",
+    "division": "চট্টগ্রাম",
+    "min": 1506,
+    "max": 1733
+   },
+   {
+    "market": "আমতলী বাজার",
+    "division": "চট্টগ্রাম",
+    "min": 1463,
+    "max": 1650
+   },
+   {
+    "market": "সদর বাজার",
+    "division": "রাজশাহী",
+    "min": 1670,
+    "max": 1845
+   },
+   {
+    "market": "বাসারহাট বাজার",
+    "division": "রাজশাহী",
+    "min": 1687,
+    "max": 1902
+   },
+   {
+    "market": "মাঠ বাজার",
+    "division": "ময়মনসিংহ",
+    "min": 1652,
+    "max": 1826
+   },
+   {
+    "market": "চৌর বাজার",
+    "division": "ময়মনসিংহ",
+    "min": 1686,
+    "max": 1940
+   },
+   {
+    "market": "বাজারহাট",
+    "division": "খুলনা",
+    "min": 1469,
+    "max": 1657
+   },
+   {
+    "market": "ডবলগেট বাজার",
+    "division": "খুলনা",
+    "min": 1531,
+    "max": 1692
+   },
+   {
+    "market": "আমবাজার",
+    "division": "সিলেট",
+    "min": 1789,
+    "max": 2059
+   },
+   {
+    "market": "চৌরাস্তা বাজার",
+    "division": "সিলেট",
+    "min": 1756,
+    "max": 1981
+   }
+  ]
+ }
+]
