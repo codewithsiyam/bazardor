@@ -1,14 +1,21 @@
+import ProductGridSkeleton from "@/components/ProductGridSkeleton";
+
 export default function CategoryLoading() {
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-6 sm:px-6" aria-busy="true" aria-label="লোড হচ্ছে">
-      <div className="skeleton h-[94px] w-full rounded-2xl" />
-      <div className="skeleton h-14 w-full rounded-2xl" />
-      <div className="skeleton h-5 w-44" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="skeleton h-[138px] rounded-2xl" />
-        ))}
+    <div role="status" aria-busy="true" className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6">
+      <span className="sr-only">লোড হচ্ছে…</span>
+      <div className="flex items-center gap-4 rounded-2xl border border-base-300 bg-base-100 p-5">
+        <div className="skeleton size-12 rounded-xl" />
+        <div className="space-y-2">
+          <div className="skeleton h-7 w-32" />
+          <div className="skeleton h-4 w-56" />
+        </div>
       </div>
+      <div className="flex justify-end rounded-2xl border border-base-300 bg-base-100 p-4">
+        <div className="skeleton h-8 w-40 rounded-lg" />
+      </div>
+      <div className="skeleton h-4 w-44" />
+      <ProductGridSkeleton count={6} />
     </div>
   );
 }
