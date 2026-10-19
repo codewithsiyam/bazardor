@@ -1,39 +1,26 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "./auth";
-
-export interface SessionUser {
-  id: string;
-  name: string;
-  email: string;
-  image: string | null;
-}
-
-export type RequireUserResult = { state: "ok"; user: SessionUser } | { state: "unavailable" };
+import { auth } from "@/lib/auth";
 
 /**
- * Server-side session check (validates the session against the database — not just the cookie).
- * Redirects to /signin when logged out; reports "unavailable" if the auth backend cannot be reached.
+ * Server-side session verification. This reads the session from the database
+ * through Better Auth – the mere presence of a cookie is never trusted.
  */
-export async function requireUser(returnTo: string): Promise<RequireUserResult> {
-  let user: SessionUser | null = null;
-  try {
-    const session = await auth.api.getSession({ headers: await headers() });
-    if (session?.user) {
-      user = {
-        id: session.user.id,
-        name: session.user.name,
-        email: session.user.email,
-        image: session.user.image ?? null,
-      };
-    }
-  } catch (error) {
-    console.error("[bazardor] session check failed:", error instanceof Error ? error.message : "unknown error");
-    return { state: "unavailable" };
-  }
+export async function getServerSession() {
+  return auth.api.getSession({ headers: await headers() });
+}
 
-  if (!user) {
-    redirect(`/signin?callbackUrl=${encodeURIComponent(returnTo)}&reason=login-required`);
+export type ServerSession = NonNullable<Awaited<ReturnType<typeof getServerSession>>>;
+
+/**
+ * Use at the top of every protected Server Component. Logged-out visitors are
+ * sent to /signin (with a callbackUrl so they return afterwards). A database
+ * failure is NOT treated as "logged out": it surfaces in app/error.tsx instead.
+ */
+export async function requireSession(callbackPath: string): Promise<ServerSession> {
+  const session = await getServerSession();
+  if (!session) {
+    redirect(`/signin?callbackUrl=${encodeURIComponent(callbackPath)}&reason=protected`);
   }
-  return { state: "ok", user };
+  return session;
 }

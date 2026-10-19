@@ -1,57 +1,70 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { MongoClient } from "mongodb";
+import { nextCookies } from "better-auth/next-js";
+import { mongoClient, mongoDb } from "@/lib/mongodb";
+import { PASSWORD_MAX, PASSWORD_MIN, validateName } from "@/lib/validation";
 
-const uri = process.env.MONGODB_URI;
+/**
+ * Better Auth server instance (email + password, optional Google / GitHub).
+ *
+ * Social providers are registered ONLY when their credentials exist in the
+ * environment, so a button can never point at a provider that does not work.
+ */
 
-if (!uri) {
-  console.error(
-    "[bazardor] MONGODB_URI is not set. Add it to .env.local (or Vercel → Environment Variables); sign-in/sign-up will fail until then.",
-  );
-}
+const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+const githubEnabled = Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET);
 
-// Re-use one client across hot reloads in development.
-const globalForMongo = globalThis as unknown as { __bazardorMongo?: MongoClient };
-const client =
-  globalForMongo.__bazardorMongo ??
-  new MongoClient(uri ?? "mongodb://127.0.0.1:27017", {
-    appName: "bazardor",
-    serverSelectionTimeoutMS: 8000,
-  });
-if (process.env.NODE_ENV !== "production") globalForMongo.__bazardorMongo = client;
-
-const db = client.db(process.env.MONGODB_DB || undefined);
-
-const googleId = process.env.GOOGLE_CLIENT_ID;
-const googleSecret = process.env.GOOGLE_CLIENT_SECRET;
-const githubId = process.env.GITHUB_CLIENT_ID;
-const githubSecret = process.env.GITHUB_CLIENT_SECRET;
-
-// Providers are registered only when fully configured.
-const socialProviders = {
-  ...(googleId && googleSecret ? { google: { clientId: googleId, clientSecret: googleSecret } } : {}),
-  ...(githubId && githubSecret ? { github: { clientId: githubId, clientSecret: githubSecret } } : {}),
-};
+/** Read by the sign-in / sign-up pages to decide which buttons to render. */
+export const socialProviders = { google: googleEnabled, github: githubEnabled } as const;
 
 const trustedOrigins = [
   process.env.BETTER_AUTH_URL,
   process.env.NEXT_PUBLIC_APP_URL,
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
-  process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined,
 ].filter((origin): origin is string => Boolean(origin));
 
 export const auth = betterAuth({
-  appName: "বাজার দর",
+  appName: "BazarDor",
   baseURL: process.env.BETTER_AUTH_URL,
   secret: process.env.BETTER_AUTH_SECRET,
-  database: mongodbAdapter(db),
+  trustedOrigins,
+  database: mongodbAdapter(mongoDb, { client: mongoClient }),
   emailAndPassword: {
     enabled: true,
-    minPasswordLength: 8,
-    // The assignment sends the user to the Sign In page after registration,
-    // so registration must not create a session by itself.
+    minPasswordLength: PASSWORD_MIN,
+    maxPasswordLength: PASSWORD_MAX,
+    // The assignment requires: after a successful sign-up, go to the sign-in page.
     autoSignIn: false,
   },
-  socialProviders,
-  trustedOrigins,
+  socialProviders: {
+    ...(googleEnabled
+      ? {
+          google: {
+            clientId: process.env.GOOGLE_CLIENT_ID as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+          },
+        }
+      : {}),
+    ...(githubEnabled
+      ? {
+          github: {
+            clientId: process.env.GITHUB_CLIENT_ID as string,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+          },
+        }
+      : {}),
+  },
+  databaseHooks: {
+    user: {
+      update: {
+        // Server-side validation for profile updates: an invalid name aborts the write.
+        before: async (user) => {
+          if (typeof user.name === "string" && validateName(user.name)) return false;
+          return true;
+        },
+      },
+    },
+  },
+  // Must stay the LAST plugin: lets server actions / handlers set auth cookies.
+  plugins: [nextCookies()],
 });
