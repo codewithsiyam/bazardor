@@ -26,7 +26,11 @@ function GithubIcon() {
   );
 }
 
-/** Renders only the providers that are really configured on the server. */
+/**
+ * Both buttons are always rendered (the assignment requires them). A provider whose
+ * credentials are missing on the server is shown disabled, so it can never start a
+ * login flow that cannot work.
+ */
 export default function SocialButtons({
   providers,
   callbackUrl,
@@ -37,8 +41,7 @@ export default function SocialButtons({
   disabled?: boolean;
 }) {
   const [pending, setPending] = useState<Provider | null>(null);
-  const enabled = (["google", "github"] as const).filter((p) => providers[p]);
-  if (enabled.length === 0) return null;
+  const all = ["google", "github"] as const;
 
   async function handle(provider: Provider) {
     setPending(provider);
@@ -62,12 +65,13 @@ export default function SocialButtons({
         অথবা
         <span className="h-px flex-1 bg-base-content/10" />
       </div>
-      <div className={`grid gap-2 ${enabled.length > 1 ? "sm:grid-cols-2" : ""}`}>
-        {enabled.map((provider) => (
+      <div className="grid gap-2 sm:grid-cols-2">
+        {all.map((provider) => (
           <button
             key={provider}
             type="button"
-            disabled={disabled || pending !== null}
+            disabled={disabled || pending !== null || !providers[provider]}
+            title={providers[provider] ? undefined : "এই লগইনটি এখনো কনফিগার করা হয়নি"}
             onClick={() => handle(provider)}
             className="btn btn-outline border-base-300 bg-base-100 font-semibold"
           >
