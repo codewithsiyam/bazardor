@@ -31,7 +31,7 @@ export default function Hero() {
           width={315}
           height={263}
           priority
-          className="h-auto w-56 shrink-0 md:w-[315px]"
+          className="h-auto w-56 shrink-0 md:w-78.75"
         />
       </div>
     </section>

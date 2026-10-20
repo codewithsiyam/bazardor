@@ -39,7 +39,9 @@ export default function Navbar({ categories }: NavbarProps) {
           router.push("/");
           router.refresh();
         },
-        onError: () => toast.error("সাইন আউট করা যায়নি। আবার চেষ্টা করুন।"),
+        onError: () => {
+          toast.error("সাইন আউট করা যায়নি। আবার চেষ্টা করুন।");
+        },
       },
     });
   };
@@ -59,7 +61,7 @@ export default function Navbar({ categories }: NavbarProps) {
   return (
     <header className="border-b border-base-300 bg-base-100">
       {/* Row 1: logo + auth */}
-      <div className="mx-auto flex min-h-[68px] max-w-6xl items-center gap-3 px-4 py-3">
+      <div className="mx-auto flex min-h-17 max-w-6xl items-center gap-3 px-4 py-3">
         <Logo onClick={closeMobile} />
         <div className="flex-1" />
 
