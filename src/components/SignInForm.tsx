@@ -5,12 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
-import { toBanglaAuthError } from "@/lib/auth-errors";
 import type { SocialAvailability } from "@/lib/providers";
-import { safeCallbackUrl } from "@/lib/utils";
+import { authErrorMessage, safeCallbackUrl, validateSignIn } from "@/lib/validation";
 import SocialButtons from "./SocialButtons";
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SignInForm({ providers }: { providers: SocialAvailability }) {
   const router = useRouter();
@@ -24,8 +21,9 @@ export default function SignInForm({ providers }: { providers: SocialAvailabilit
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (reason === "login-required") {
-      toast.error("এই পাতা দেখতে আগে সাইন ইন করুন।", { id: "login-required" });
+    // /proxy.ts and requireSession() redirect here with ?reason=protected.
+    if (reason === "protected" || reason === "login-required") {
+      toast.error("এই পেজ দেখতে আগে সাইন ইন করুন।", { id: "login-required" });
     }
   }, [reason]);
 
@@ -34,14 +32,10 @@ export default function SignInForm({ providers }: { providers: SocialAvailabilit
     setError(null);
 
     const trimmedEmail = email.trim();
-    if (!EMAIL_PATTERN.test(trimmedEmail)) {
-      setError("সঠিক ইমেইল ঠিকানা দিন।");
-      toast.error("সঠিক ইমেইল ঠিকানা দিন।");
-      return;
-    }
-    if (password.length < 8) {
-      setError("পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।");
-      toast.error("পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।");
+    const invalid = Object.values(validateSignIn({ email: trimmedEmail, password }))[0];
+    if (invalid) {
+      setError(invalid);
+      toast.error(invalid);
       return;
     }
 
@@ -49,7 +43,7 @@ export default function SignInForm({ providers }: { providers: SocialAvailabilit
     try {
       const { error: authError } = await authClient.signIn.email({ email: trimmedEmail, password });
       if (authError) {
-        const message = toBanglaAuthError(authError, "সাইন ইন করা যায়নি। আবার চেষ্টা করুন।");
+        const message = authErrorMessage(authError);
         setError(message);
         toast.error(message);
         return;

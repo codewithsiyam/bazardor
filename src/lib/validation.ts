@@ -83,20 +83,22 @@ export interface AuthErrorLike {
   status?: number;
 }
 
-/** Maps Better Auth error codes to friendly Bangla messages. */
+/** Maps Better Auth errors (code first, message as a fallback) to friendly Bangla messages. */
 export function authErrorMessage(error: AuthErrorLike | null | undefined): string {
   if (!error) return "কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।";
   const code = (error.code ?? "").toUpperCase();
+  const message = (error.message ?? "").toUpperCase();
+  const has = (...needles: string[]) => needles.some((needle) => code.includes(needle) || message.includes(needle));
 
-  if (code.includes("USER_ALREADY_EXISTS")) return "এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট খোলা হয়েছে।";
-  if (code.includes("INVALID_EMAIL_OR_PASSWORD") || code.includes("INVALID_PASSWORD")) {
+  if (has("USER_ALREADY_EXISTS", "ALREADY EXISTS")) return "এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট খোলা হয়েছে।";
+  if (has("INVALID_EMAIL_OR_PASSWORD", "INVALID_PASSWORD", "INVALID EMAIL OR PASSWORD")) {
     return "ইমেইল বা পাসওয়ার্ড সঠিক নয়।";
   }
-  if (code.includes("INVALID_EMAIL")) return "সঠিক ইমেইল ঠিকানা লিখুন।";
-  if (code.includes("PASSWORD_TOO_SHORT")) return `পাসওয়ার্ড কমপক্ষে ${PASSWORD_MIN} অক্ষরের হতে হবে।`;
-  if (code.includes("PASSWORD_TOO_LONG")) return "পাসওয়ার্ড অনেক বড় হয়ে গেছে।";
-  if (code.includes("USER_NOT_FOUND")) return "এই ইমেইল দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি।";
-  if (code.includes("PROVIDER_NOT_FOUND")) return "এই সোশ্যাল লগইনটি এখনো চালু করা হয়নি।";
+  if (has("INVALID_EMAIL")) return "সঠিক ইমেইল ঠিকানা লিখুন।";
+  if (has("PASSWORD_TOO_SHORT")) return `পাসওয়ার্ড কমপক্ষে ${PASSWORD_MIN} অক্ষরের হতে হবে।`;
+  if (has("PASSWORD_TOO_LONG")) return "পাসওয়ার্ড অনেক বড় হয়ে গেছে।";
+  if (has("USER_NOT_FOUND")) return "এই ইমেইল দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি।";
+  if (has("PROVIDER_NOT_FOUND")) return "এই সোশ্যাল লগইনটি এখনো চালু করা হয়নি।";
   if (typeof error.status === "number" && error.status >= 500) {
     return "সার্ভারে সমস্যা হচ্ছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
   }

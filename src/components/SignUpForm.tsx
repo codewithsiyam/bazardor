@@ -5,11 +5,9 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
-import { toBanglaAuthError } from "@/lib/auth-errors";
 import type { SocialAvailability } from "@/lib/providers";
+import { authErrorMessage, validateSignUp } from "@/lib/validation";
 import SocialButtons from "./SocialButtons";
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SignUpForm({ providers }: { providers: SocialAvailability }) {
   const router = useRouter();
@@ -31,10 +29,10 @@ export default function SignUpForm({ providers }: { providers: SocialAvailabilit
 
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
-    if (trimmedName.length < 2) return fail("নাম কমপক্ষে ২ অক্ষরের হতে হবে।");
-    if (!EMAIL_PATTERN.test(trimmedEmail)) return fail("সঠিক ইমেইল ঠিকানা দিন।");
-    if (password.length < 8) return fail("পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।");
-    if (password !== confirm) return fail("দুটি পাসওয়ার্ড মিলছে না।");
+    const invalid = Object.values(
+      validateSignUp({ name: trimmedName, email: trimmedEmail, password, confirmPassword: confirm }),
+    )[0];
+    if (invalid) return fail(invalid);
 
     setPending(true);
     try {
@@ -44,7 +42,7 @@ export default function SignUpForm({ providers }: { providers: SocialAvailabilit
         password,
       });
       if (authError) {
-        fail(toBanglaAuthError(authError, "অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।"));
+        fail(authErrorMessage(authError));
         return;
       }
       toast.success("অ্যাকাউন্ট তৈরি হয়েছে! এখন সাইন ইন করুন।");

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
-import { toBanglaAuthError } from "@/lib/auth-errors";
+import { NAME_MAX, authErrorMessage, validateName } from "@/lib/validation";
 
 export default function ProfileUpdateForm({ initialName, email }: { initialName: string; email: string }) {
   const router = useRouter();
@@ -23,8 +23,8 @@ export default function ProfileUpdateForm({ initialName, email }: { initialName:
     setError(null);
 
     const trimmed = name.trim();
-    if (trimmed.length < 2) return fail("নাম কমপক্ষে ২ অক্ষরের হতে হবে।");
-    if (trimmed.length > 60) return fail("নাম ৬০ অক্ষরের বেশি হতে পারবে না।");
+    const invalid = validateName(trimmed);
+    if (invalid) return fail(invalid);
     if (trimmed === initialName) return fail("নতুন কোনো পরিবর্তন করা হয়নি।");
 
     setPending(true);
@@ -32,7 +32,7 @@ export default function ProfileUpdateForm({ initialName, email }: { initialName:
       // Better Auth: https://better-auth.com/docs/concepts/users-accounts#update-user
       const { error: authError } = await authClient.updateUser({ name: trimmed });
       if (authError) {
-        fail(toBanglaAuthError(authError, "তথ্য আপডেট করা যায়নি। আবার চেষ্টা করুন।"));
+        fail(authErrorMessage(authError));
         return;
       }
       toast.success("প্রোফাইল আপডেট হয়েছে!");
@@ -56,7 +56,7 @@ export default function ProfileUpdateForm({ initialName, email }: { initialName:
           type="text"
           autoComplete="name"
           required
-          maxLength={60}
+          maxLength={NAME_MAX}
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="input w-full bg-base-100 shadow-sm"

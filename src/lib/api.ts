@@ -6,8 +6,9 @@ import { findProductByParam } from "@/lib/products";
 /**
  * Centralised BazarDor API client.
  *
- * - Primary source: https://api.api-store.workers.dev/api/bazardor (inspected live).
- * - The assignment's alternative host is tried ONLY when the primary one fails
+ * - Primary source: https://openapi.programming-hero.com/api/bazardor (the "main API" of the
+ *   assignment). Its schema was inspected live and is identical to the two mirrors below.
+ * - The mirrors (api-store / abcz workers) are tried ONLY when the primary host fails
  *   (network error, non-2xx, or a payload that does not match the schema).
  * - A source is never merged with another: each list comes whole from the first
  *   source that answers with valid records.
@@ -15,9 +16,9 @@ import { findProductByParam } from "@/lib/products";
  */
 
 const DEFAULT_BASES = [
+  "https://openapi.programming-hero.com/api/bazardor",
   "https://api.api-store.workers.dev/api/bazardor",
   "https://api.abcz.workers.dev/api/bazardor",
-  "https://openapi.programming-hero.com/api/bazardor",
 ];
 
 const REVALIDATE_SECONDS = 300;

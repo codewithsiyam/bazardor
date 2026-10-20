@@ -56,3 +56,8 @@ test("auth error codes map to Bangla messages", () => {
   assert.match(authErrorMessage({ status: 429 }), /অপেক্ষা/);
   assert.match(authErrorMessage(null), /সমস্যা/);
 });
+
+test("auth errors fall back to the message text when no code is present", () => {
+  assert.match(authErrorMessage({ message: "Invalid email or password" }), /সঠিক নয়/);
+  assert.match(authErrorMessage({ message: "User already exists" }), /আগেই অ্যাকাউন্ট/);
+});

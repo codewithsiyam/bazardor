@@ -1,3 +1,5 @@
+import { getInitial } from "@/lib/utils";
+
 interface AvatarProps {
   name: string;
   image?: string | null;
@@ -13,7 +15,7 @@ export default function Avatar({
   className = "size-9",
   textClassName = "text-sm",
 }: AvatarProps) {
-  const initial = Array.from(name.trim())[0]?.toUpperCase() ?? "U";
+  const initial = getInitial(name);
 
   if (image) {
     return (
