@@ -124,8 +124,8 @@ Dynamic routes are rendered on the server, so refreshing `/category/[slug]` or `
 
 ## 🔗 Submission links
 
-- Live site:
-- GitHub repository:
+- Live site: https://bazardor999.vercel.app/
+- GitHub repository: https://github.com/codewithsiyam/bazardor
 
 ---
 
