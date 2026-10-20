@@ -141,7 +141,7 @@ export default async function ProductPage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-start rounded-2xl bg-base-200 px-5 py-4 sm:min-w-37.5">
+        <div className="flex shrink-0 flex-col items-start rounded-2xl bg-base-200 px-5 py-4 sm:min-w-[150px]">
           <p className="text-sm">আজকের দাম</p>
           <p className="text-3xl font-bold leading-tight">{formatPrice(product.today)}</p>
           <p className="text-sm">{unitLabel ? `টাকা / ${unitLabel}` : "টাকা"}</p>

@@ -57,11 +57,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   ]);
 
   return (
-    <html lang="bn" data-theme="bazardor" data-scroll-behavior="smooth" className={hindSiliguri.variable}>
+    <html lang="bn" data-theme="bazardor" className={hindSiliguri.variable}>
       <body className="flex min-h-screen flex-col font-sans antialiased">
         <a
           href="#main"
-          className="sr-only z-60 rounded-lg bg-primary px-4 py-2 text-primary-content focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+          className="sr-only z-[60] rounded-lg bg-primary px-4 py-2 text-primary-content focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
         >
           মূল অংশে যান
         </a>

@@ -124,8 +124,8 @@ Dynamic routes are rendered on the server, so refreshing `/category/[slug]` or `
 
 ## 🔗 Submission links
 
-- Live site: _add after deployment_
-- GitHub repository: _add after pushing_
+- Live site:
+- GitHub repository:
 
 ---
 
