@@ -4,11 +4,11 @@ Status legend: ✅ implemented · 🧪 logic tested with Node + mock API · ⏳ 
 
 | # | Requirement (assignment) | Implemented in | Status |
 |---|---|---|---|
-| 1 | Navbar: logo `🛒 বাজার দর` + Bangla date | `components/NavBar.tsx`, `BanglaDate.tsx`, `lib/format.ts#getBanglaDate` | ✅ 🧪 date · ⏳ visual |
-| 2 | Category links, active highlighted | `NavBar.tsx` (`aria-current`, filled chip) | ✅ ⏳ |
-| 3 | Auth buttons / profile + sign-out | `AuthMenu.tsx`, `SignOutButton.tsx` | ✅ ⏳ |
+| 1 | Navbar: logo `🛒 বাজার দর` + Bangla date | `components/Navbar.tsx`, `BanglaDate.tsx`, `lib/format.ts#getBanglaDate` | ✅ 🧪 date · ⏳ visual |
+| 2 | Category links, active highlighted | `Navbar.tsx` (`aria-current`, filled chip) | ✅ ⏳ |
+| 3 | Auth buttons / profile + sign-out | `Navbar.tsx` (UserMenu), `SignOutButton.tsx` | ✅ ⏳ |
 | 4 | Infinite price ticker | `PriceTicker.tsx`, `globals.css` (reduced-motion aware) | ✅ ⏳ |
-| 5 | Mobile menu | `NavBar.tsx` (hamburger, `aria-expanded`) | ✅ ⏳ |
+| 5 | Mobile menu | `Navbar.tsx` (hamburger, `aria-expanded`) | ✅ ⏳ |
 | 6 | Hero + CTA → `#সব-পণ্য` | `Hero.tsx`, section id in `app/page.tsx` | ✅ ⏳ |
 | 7 | Top-6 risers / fallers | `PriceMovers.tsx`, `lib/products.ts` | ✅ 🧪 |
 | 8 | All products grid + cards | `ProductGrid.tsx`, `ProductCard.tsx` | ✅ ⏳ |
@@ -22,7 +22,7 @@ Status legend: ✅ implemented · 🧪 logic tested with Node + mock API · ⏳ 
 | 16 | Sign Up → toast → redirect to Sign In | `SignUpForm.tsx` (`autoSignIn: false` in `lib/auth.ts`) | ✅ ⏳ needs MongoDB |
 | 17 | Sign In → home, error toast | `SignInForm.tsx` | ✅ ⏳ needs MongoDB |
 | 18 | Google / GitHub login | `SocialButtons.tsx`, `lib/auth.ts` | ✅ ⏳ needs OAuth credentials |
-| 19 | Toasts for auth + protected redirect | `AppToaster.tsx`, `SignInForm.tsx` (`reason=login-required`) | ✅ ⏳ |
+| 19 | Toasts for auth + protected redirect | `ToasterProvider.tsx`, `SignInForm.tsx` (`reason=login-required`) | ✅ ⏳ |
 | 20 | Footer text | `Footer.tsx` | ✅ |
 | 21 | 404 page | `app/not-found.tsx` | ✅ ⏳ |
 | 22 | Reload of dynamic routes works | server-rendered `[slug]` routes, no static export | ✅ ⏳ deployed check |

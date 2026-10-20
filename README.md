@@ -41,7 +41,7 @@ src/
 │   ├── api/auth/[...all]/route.ts       Better Auth handler
 │   ├── not-found.tsx  error.tsx         404 + error boundary
 │   └── layout.tsx  globals.css          Root layout, theme tokens, ticker CSS
-├── components/                          NavBar, AuthMenu, PriceTicker, ProductCard, forms …
+├── components/                          Navbar (with user menu), PriceTicker, ProductCard, forms …
 ├── lib/
 │   ├── api.ts                           API client: failover, validation, caching
 │   ├── format.ts                        Bengali digits, BDT prices, units, Bangla date
