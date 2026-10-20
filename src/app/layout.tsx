@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   ]);
 
   return (
-    <html lang="bn" data-theme="bazardor" className={hindSiliguri.variable}>
+    <html lang="bn" data-theme="bazardor" data-scroll-behavior="smooth" className={hindSiliguri.variable}>
       <body className="flex min-h-screen flex-col font-sans antialiased">
         <a
           href="#main"
